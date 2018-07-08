@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 // CREATE
 app.post('/todos', (req, res, next) => {
-	console.log(req.body);
+	// console.log(req.body);
 	var todo = new Todo({
 		text: req.body.text,
 		completed: req.body.completed
@@ -22,13 +22,26 @@ app.post('/todos', (req, res, next) => {
 			// Promise.reject();
 			res.status(400).send(e);
 		} else {
-			console.log("Here!");
+			// console.log("Here!");
 			res.send(doc);
 		}
 	}, next)
 })
 
 
+ 	var todo = new Todo({
+		text: ""
+	});
+
+	todo.save().then((doc, e) => {
+		if (e) {
+			// Promise.reject();
+			console.log(e);
+		} else {
+			// console.log("Here!");
+			console.log('Saved!');
+		}
+	})
 
 
 app.listen(8080, () => {
@@ -36,7 +49,7 @@ app.listen(8080, () => {
 })
 
 
-
+module.exports = {app};
 //
 //
 // var a = new Todo({
