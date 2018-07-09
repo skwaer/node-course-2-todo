@@ -8,6 +8,7 @@ var {User} = require('./models/user');
 const {ObjectID} = require('mongodb');
 
 var app = express();
+const port = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
 
@@ -60,8 +61,8 @@ app.get('/todos/:todoId', (req, res) => {
 
 })
 
-app.listen(8080, () => {
-	console.log('Started on port 8080');
+app.listen(port, () => {
+	console.log(`Started on port ${port}`);
 })
 
 
