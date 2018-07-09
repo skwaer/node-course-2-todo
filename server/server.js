@@ -1,11 +1,13 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todo');
-var {User} = require('./models/user');
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 
 const {ObjectID} = require('mongodb');
+
 
 var app = express();
 const port = process.env.PORT || 8080;
@@ -65,7 +67,6 @@ app.delete('/todos/:id', (req, res) => {
 	var id = req.params.id;
 
 	if (!ObjectID.isValid(id)) {
-		// console.log('ID not valid');
 		res.status(404).send('ID not valid');
 		return;
 	}
@@ -79,8 +80,44 @@ app.delete('/todos/:id', (req, res) => {
 	}, (e) => {
 		res.status(400).send(e);
 	})
-
 })
+
+app.patch('/todos/:id', (req,res) => {
+	var id = req.params.id;
+	// console.log(req.body);
+	var body = _.pick(req.body, ['text', 'completed']);
+	// console.log(body);
+	// body.completed = (body.completed == 'true');
+	// console.log(body);
+	if(_.isBoolean(body.completed))
+		console.log('Is boolean!');
+
+	if (!ObjectID.isValid(id)) {
+		res.status(404).send('ID not valid');
+		return;
+	}
+
+	if (_.isBoolean(body.completed) && body.completed) {
+		body.completedAt = new Date().getTime();
+	} else {
+		body.completed = false;
+		body.completedAt = null;
+	}
+
+	Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
+		.then((todo) => {
+		if (todo) {
+			console.log("Hi!");
+			res.send({todo});
+		}
+		else {
+			res.status(404).send('ID not found and not updated');
+		}
+	}, (e) => {
+			res.status(400).send(e);
+	})
+})
+
 
 app.listen(port, () => {
 	console.log(`Started on port ${port}`);
