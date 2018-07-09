@@ -4,10 +4,14 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
+const {ObjectID} = require('mongodb');
+
 const todos =[{
+	_id: new ObjectID(),
 	text: 'First test todo'
 }, {
-	text: 'Second test todo'
+	_id: new ObjectID(),
+ 	text: 'Second test todo'
 }]
 
 beforeEach((done) => {
@@ -24,7 +28,7 @@ describe('GET /todos', () => {
 			.get('/todos')
 			.expect(200)
 			.expect((res) => {
-				console.log(res.body.todos);
+				// console.log(res.body.todos);
 				expect(res.body.todos.length).toBe(2);
 			})
 			.end(done);
@@ -53,7 +57,7 @@ describe('POST /todos', () => {
 					done();
 				}).catch((e) => done(e) );
 			})
-		// done();
+
 	})
 	it('should not create todo with invalid body data', (done) => {
 		var text ='';
@@ -76,8 +80,35 @@ describe('POST /todos', () => {
 				}).catch((e) => done(e) );
 			})
 	})
-
 })
 
-// console.log(process._getActiveRequests());
-// console.log(process._getActiveHandles());
+describe('GET /todo/:id', () => {
+	it('should return todo doc', (done) => {
+		request(app)
+		.get(`/todos/${todos[0]._id.toHexString()}`)
+		.expect(200)
+		.expect((res) => {
+			expect(res.body.todo.text).toBe(todos[0].text);
+		}).end(done);
+	})
+
+	it('should return 404 if todo not found', (done) => {
+		var randomId = new ObjectID();
+
+		request(app)
+		.get(`/todos/${randomId}`)
+		.expect(404)
+		.end(done);
+
+	})
+
+	it('should return 404 for non-object', (done) => {
+		request(app)
+		.get('/todos/123')
+		.expect(404)
+		.end(done);
+
+
+	})
+
+})

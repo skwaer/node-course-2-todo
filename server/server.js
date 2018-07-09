@@ -42,7 +42,7 @@ app.get('/todos/:todoId', (req, res) => {
 	// check isValid
 		// send 404
 	if (!ObjectID.isValid(todoId)) {
-		console.log('ID not valid');
+		// console.log('ID not valid');
 		res.status(404).send('ID not valid');
 		return;
 	}
