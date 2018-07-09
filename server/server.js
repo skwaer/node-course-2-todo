@@ -17,32 +17,20 @@ app.post('/todos', (req, res, next) => {
 		completed: req.body.completed
 	});
 
-	todo.save().then((doc, e) => {
-		if (e) {
-			// Promise.reject();
+	todo.save().then((doc) => {
+		res.send(doc);
+		}, (e) => {
 			res.status(400).send(e);
-		} else {
-			// console.log("Here!");
-			res.send(doc);
-		}
-	}, next)
-})
-
-
- 	var todo = new Todo({
-		text: ""
+		});
 	});
 
-	todo.save().then((doc, e) => {
-		if (e) {
-			// Promise.reject();
-			console.log(e);
-		} else {
-			// console.log("Here!");
-			console.log('Saved!');
-		}
+app.get('/todos', (req, res) => {
+	Todo.find().then((todos) => {
+		res.send({todos});
+	}, (e) => {
+		res.status(400).send(e);
 	})
-
+})
 
 app.listen(8080, () => {
 	console.log('Started on port 8080');
