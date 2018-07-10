@@ -89,8 +89,8 @@ app.patch('/todos/:id', (req,res) => {
 	// console.log(body);
 	// body.completed = (body.completed == 'true');
 	// console.log(body);
-	if(_.isBoolean(body.completed))
-		console.log('Is boolean!');
+	// if(_.isBoolean(body.completed))
+	// 	console.log('Is boolean!');
 
 	if (!ObjectID.isValid(id)) {
 		res.status(404).send('ID not valid');
@@ -107,7 +107,7 @@ app.patch('/todos/:id', (req,res) => {
 	Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
 		.then((todo) => {
 		if (todo) {
-			console.log("Hi!");
+			// console.log("Hi!");
 			res.send({todo});
 		}
 		else {
