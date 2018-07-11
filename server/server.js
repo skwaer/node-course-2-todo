@@ -19,7 +19,7 @@ var app = express();
 app.use(bodyParser.json());
 
 // CREATE
-app.post('/todos', (req, res, next) => {
+app.post('/todos', (req, res) => {
 	// console.log(req.body);
 	var todo = new Todo({
 		text: req.body.text,
@@ -30,8 +30,8 @@ app.post('/todos', (req, res, next) => {
 		res.send(doc);
 		}, (e) => {
 			res.status(400).send(e);
-		});
 	});
+});
 
 app.get('/todos', (req, res) => {
 	Todo.find().then((todos) => {
@@ -118,6 +118,48 @@ app.patch('/todos/:id', (req,res) => {
 			res.status(404).send('ID not found and not updated');
 		}
 	}, (e) => {
+			res.status(400).send(e);
+	})
+})
+
+
+app.post('/users', (req,res) => {
+	console.log(req.body);
+	var body = _.pick(req.body, ['email', 'password', 'tokens']);
+	var body = _.pick(req.body, ['email', 'password']);
+
+	// var user = {
+	// 	email: 'skwaer@gmail.com',
+	// 	password: 'abcd1234',
+	// 	tokens: {
+	// 		access: 'Access',
+	// 		token: 'truetdat'
+	// 	}
+	// }
+
+	// console.log(req.body);
+	// var user = new User({
+	// 	email: req.body.email,
+	// 	password: req.body.password,
+	// 	tokens: req.body.tokens
+	// });
+	var user = new User(body);
+
+	// User.findByToken
+	// user.generateAuthToken()
+
+// i am not clear on how promises really work
+
+	user.save().then(() => {
+		console.log('here 1');
+		return user.generateAuthToken();
+		// res.send(doc);
+	}).then((token) => {
+		console.log(token);
+		res.header('x-auth', token).send(user);
+		console.log('here 2');
+
+	}).catch((e) => {
 			res.status(400).send(e);
 	})
 })
