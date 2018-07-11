@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate');
 
 const {ObjectID} = require('mongodb');
 
@@ -151,19 +152,24 @@ app.post('/users', (req,res) => {
 // i am not clear on how promises really work
 
 	user.save().then(() => {
-		console.log('here 1');
+		// console.log('here 1');
 		return user.generateAuthToken();
 		// res.send(doc);
 	}).then((token) => {
 		console.log(token);
 		res.header('x-auth', token).send(user);
-		console.log('here 2');
+		// console.log('here 2');
 
 	}).catch((e) => {
 			res.status(400).send(e);
 	})
 })
 
+
+
+app.get('/users/me', authenticate, (req, res) => {
+	res.send(req.user);
+})
 
 app.listen(port, () => {
 	console.log(`Started on port ${port}`);
