@@ -284,3 +284,61 @@ describe('POST /users', () => {
 	})
 
 })
+
+describe('POST /users/login', () => {
+	it('should login user and return auth token', (done) => {
+		email = users[1].email;
+		password = users[1].password
+
+		request(app)
+			.post('/users/login')
+			.send({email, password})
+			.expect(200)
+			// .end(done)
+			.expect((res) => {
+				expect(res.headers['x-auth']).toBeTruthy();
+			// }).end(done);
+			})
+			.end((err, res) => {
+				if (err)
+					return done(err);
+
+				User.findById(users[1]._id).then((user) => {
+					expect(user.tokens[0]).toMatchObject({
+						access: 'auth',
+						token: res.headers['x-auth']
+					});
+					done();
+				}).catch((e) => done(e));
+
+			})
+
+	})
+	it('should reject invalid login', (done) => {
+		email = users[1].email;
+		password = 'incorret password';
+
+		request(app)
+			.post('/users/login')
+			.send({email, password})
+			.expect(400)
+			.expect((res) => {
+				expect(res.headers['x-auth']).toBeFalsy();
+			})
+			.end((err, res) => {
+				if (err)
+					return done(err);
+
+				User.findById(users[1]._id).then((user) => {
+					expect(user.tokens[0].token.length).toBe(0);
+					done();
+				}).catch((e) => done(e));
+
+			})
+
+
+
+		done();
+	})
+
+})
