@@ -125,7 +125,7 @@ app.patch('/todos/:id', (req,res) => {
 
 
 app.post('/users', (req,res) => {
-	console.log(req.body);
+	// console.log(req.body);
 	var body = _.pick(req.body, ['email', 'password', 'tokens']);
 	var body = _.pick(req.body, ['email', 'password']);
 
@@ -156,7 +156,7 @@ app.post('/users', (req,res) => {
 		return user.generateAuthToken();
 		// res.send(doc);
 	}).then((token) => {
-		console.log(token);
+		// console.log(token);
 		res.header('x-auth', token).send(user);
 		// console.log('here 2');
 
