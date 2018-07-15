@@ -127,7 +127,7 @@ app.patch('/todos/:id', (req,res) => {
 
 app.post('/users', (req,res) => {
 	// console.log(req.body);
-	var body = _.pick(req.body, ['email', 'password', 'tokens']);
+	// var body = _.pick(req.body, ['email', 'password', 'tokens']);
 	var body = _.pick(req.body, ['email', 'password']);
 
 	// var user = {
@@ -139,18 +139,9 @@ app.post('/users', (req,res) => {
 	// 	}
 	// }
 
-	// console.log(req.body);
-	// var user = new User({
-	// 	email: req.body.email,
-	// 	password: req.body.password,
-	// 	tokens: req.body.tokens
-	// });
+	console.log(req.body);
 	var user = new User(body);
 
-	// User.findByToken
-	// user.generateAuthToken()
-
-// i am not clear on how promises really work
 
 	user.save().then(() => {
 		// console.log('here 1');
@@ -188,6 +179,15 @@ app.post('/users/login', (req,res) => {
 	// set auth tokens
 	// send headers
 })
+
+app.delete('/users/me/token', authenticate, (req, res) => {
+
+	req.user.removeToken(req.token).then(() => {
+		res.status(200).send();
+	}, () => {
+		res.status(400).send();
+	})
+});
 
 
 app.listen(port, () => {
