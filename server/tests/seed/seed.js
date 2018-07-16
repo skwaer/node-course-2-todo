@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
-const salt = '123';
+const salt = process.env.JWT_SECRET;
 
 const users = [{
 		_id: userOneId,
