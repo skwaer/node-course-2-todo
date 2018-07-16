@@ -330,15 +330,37 @@ describe('POST /users/login', () => {
 					return done(err);
 
 				User.findById(users[1]._id).then((user) => {
-					expect(user.tokens[0].token.length).toBe(0);
+					expect(user.tokens.length).toBe(0);
 					done();
 				}).catch((e) => done(e));
 
 			})
-
-
-
-		done();
 	})
 
+})
+
+describe('POST /users/me/token', () => {
+	it('should remove auth token on logout', (done) => {
+		// DELETE /users/me/token
+		// Set x-auth equal token
+
+		request(app)
+			.delete('/users/me/token')
+			.set('x-auth', users[0].tokens[0].token)
+			.expect(200)
+			.end((err, res) => {
+				if (err)
+					return done(err);
+
+				User.findById(users[0]._id).then((user) => {
+					expect(user.tokens.length).toBe(0);
+					done();
+				}).catch((e) => done(e));
+			})
+
+
+		// 200
+		// end to find user verify that tokens array has lenght of 0
+
+	})
 })
