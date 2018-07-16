@@ -21,11 +21,12 @@ var app = express();
 app.use(bodyParser.json());
 
 // CREATE
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
 	// console.log(req.body);
 	var todo = new Todo({
 		text: req.body.text,
-		completed: req.body.completed
+		_creator: req.user._id
+		// completed: req.body.completed
 	});
 
 	todo.save().then((doc) => {
@@ -35,8 +36,10 @@ app.post('/todos', (req, res) => {
 	});
 });
 
-app.get('/todos', (req, res) => {
-	Todo.find().then((todos) => {
+app.get('/todos', authenticate, (req, res) => {
+	Todo.find({
+		_creator: req.user._id
+	}).then((todos) => {
 		res.send({todos});
 	}, (e) => {
 		res.status(400).send(e);
@@ -44,7 +47,7 @@ app.get('/todos', (req, res) => {
 })
 
 // GET ONE TODO
-app.get('/todos/:todoId', (req, res) => {
+app.get('/todos/:todoId', authenticate, (req, res) => {
 	// res.send(req.params);
 	var todoId = req.params.todoId;
 
@@ -56,7 +59,10 @@ app.get('/todos/:todoId', (req, res) => {
 		return;
 	}
 
-	Todo.findById(todoId).then((todo) => {
+	Todo.findOne({
+		_creator: req.user._id,
+		_id: todoId
+	}).then((todo) => {
 		if (todo)
 			res.send({todo});
 		else {
@@ -69,7 +75,7 @@ app.get('/todos/:todoId', (req, res) => {
 
 })
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
 	var id = req.params.id;
 
 	if (!ObjectID.isValid(id)) {
@@ -77,7 +83,10 @@ app.delete('/todos/:id', (req, res) => {
 		return;
 	}
 
-	Todo.findByIdAndRemove(id).then((todo) => {
+	Todo.findOneAndRemove({
+		_id: id,
+		_creator: req.user._id
+	}).then((todo) => {
 		if (todo)
 			res.send({todo});
 		else {
@@ -88,7 +97,7 @@ app.delete('/todos/:id', (req, res) => {
 	})
 })
 
-app.patch('/todos/:id', (req,res) => {
+app.patch('/todos/:id', authenticate, (req,res) => {
 	var id = req.params.id;
 	// console.log(req.body);
 	var body = _.pick(req.body, ['text', 'completed']);
@@ -110,7 +119,11 @@ app.patch('/todos/:id', (req,res) => {
 		body.completedAt = null;
 	}
 
-	Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
+	//find One and update
+	Todo.findOneAndUpdate({
+		_id: id,
+		_creator: req.user._id
+			}, {$set: body}, {new: true})
 		.then((todo) => {
 		if (todo) {
 			// console.log("Hi!");
@@ -139,7 +152,7 @@ app.post('/users', (req,res) => {
 	// 	}
 	// }
 
-	console.log(req.body);
+	// console.log(req.body);
 	var user = new User(body);
 
 
